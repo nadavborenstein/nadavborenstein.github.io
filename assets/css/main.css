@@ -3122,7 +3122,7 @@ input, select, textarea {
 				#header.alt .logo img {
 					display: block;
 					margin: 0 auto;
-					max-width: 40%;
+					max-width: 20%;
 					height: auto;  
 					border-radius: 50%;
 				}
