@@ -3126,6 +3126,10 @@ input, select, textarea {
 					height: auto;  
 					border-radius: 50%;
 				}
+			#heather.alt ul > li {
+			    display: inline-block;
+			    /* You can also add some margins here to make it look prettier */
+			}
 
 		@media screen and (max-width: 1280px) {
 
