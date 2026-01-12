@@ -12,6 +12,41 @@
 		<link rel="shortcut icon" type="image/jpg" href="images/favicon.png"/>
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+		<style>
+			/* Base style for the hidden articles */
+			.extra-pub {
+				transition: all 0.4s ease-in-out;
+				overflow: hidden;
+				opacity: 0;
+				max-height: 0;
+				transform: translateY(20px);
+				/* Hide margins/padding when collapsed to prevent gaps */
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				padding-top: 0 !important;
+				padding-bottom: 0 !important;
+			}
+		
+			/* State when fully visible */
+			.extra-pub.visible {
+				opacity: 1;
+				max-height: 2000px; /* Large enough to fit content */
+				transform: translateY(0);
+				/* Reset margins/padding - HTML5 UP usually handles this, 
+				   but 'inherit' ensures we return to the theme's defaults */
+				margin-top: inherit !important;
+				margin-bottom: inherit !important;
+				padding-top: inherit !important;
+				padding-bottom: inherit !important;
+			}
+			
+			/* Utility to completely remove from layout */
+			.is-hidden {
+				display: none !important;
+			}
+		</style>
+
 	</head>
 	<body class="is-preload">
 
@@ -222,7 +257,7 @@
 										</article>
 									</div>
 									<div style="text-align: center; margin-top: 2em;">
-										<button id="show-more-btn" class="button">Show More</button>
+										<button id="show-more-btn" class="button primary">Show More</button>
 									</div>
 								</div>
 							</section>
@@ -644,38 +679,65 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			<script src="assets/js/main.js"></script>
 
 		
-			<script>
-				document.addEventListener('DOMContentLoaded', function() {
-					// Configuration
-					const itemsToShow = 4;
-					const container = document.querySelector('#publications .features');
-					const articles = container.querySelectorAll('article');
-					const btn = document.getElementById('show-more-btn');
-			
-					// 1. Hide items initially
-					if (articles.length > itemsToShow) {
-						for (let i = itemsToShow; i < articles.length; i++) {
-							articles[i].style.display = 'none';
-						}
-					} else {
-						// If there are 4 or fewer items, hide the button completely
-						btn.style.display = 'none';
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				// Configuration
+				const itemsToShow = 4;
+				const container = document.querySelector('#publications .features');
+				const articles = container.querySelectorAll('article');
+				const btn = document.getElementById('toggle-pubs-btn');
+				let isExpanded = false;
+
+				// 1. Initialize: Hide items > 4
+				if (articles.length > itemsToShow) {
+					for (let i = itemsToShow; i < articles.length; i++) {
+						// Add the animation class and the display:none helper
+						articles[i].classList.add('extra-pub', 'is-hidden');
 					}
-			
-					// 2. Add click event to the button
-					btn.addEventListener('click', function(e) {
-						e.preventDefault();
-						
-						// Show all hidden articles
+				} else {
+					btn.style.display = 'none';
+				}
+
+				// 2. Click Handler
+				btn.addEventListener('click', function(e) {
+					e.preventDefault();
+
+					if (!isExpanded) {
+						// --- EXPANDING ---
 						for (let i = itemsToShow; i < articles.length; i++) {
-							articles[i].style.display = ''; // Resets to default CSS display
+							const el = articles[i];
+							el.classList.remove('is-hidden'); // Put back into document flow
+							
+							// Small delay to allow browser to register 'display: block' before animating
+							setTimeout(() => {
+								el.classList.add('visible');
+							}, 20); 
 						}
+						btn.innerText = "Show Less";
+						isExpanded = true;
+					} else {
+						// --- COLLAPSING ---
 						
-						// Hide the button after expanding
-						btn.style.display = 'none';
-					});
+						// Optional: Scroll back to the top of publications so user isn't lost
+						document.getElementById('publications').scrollIntoView({ 
+							behavior: 'smooth' 
+						});
+
+						for (let i = itemsToShow; i < articles.length; i++) {
+							const el = articles[i];
+							el.classList.remove('visible'); // Triggers the collapse animation
+							
+							// Wait for CSS transition (0.4s) to finish before setting display:none
+							setTimeout(() => {
+								if (!isExpanded) el.classList.add('is-hidden');
+							}, 400); 
+						}
+						btn.innerText = "Show More";
+						isExpanded = false;
+					}
 				});
-			</script>
+			});
+		</script>
 
 	</body>
 </html>
